@@ -15,14 +15,14 @@ using int128_t = boost::multiprecision::int128_t;
 
 namespace constants {
 
-static const std::string token_name    = "Token";
-static const std::string token_symbol  = "TOKEN";
+static const std::string token_name    = "network anonymous";
+static const std::string token_symbol  = "net";
 constexpr uint32_t token_decimals      = 8;
 constexpr std::size_t max_address_size = 25;
 constexpr std::size_t max_name_size    = 32;
 constexpr std::size_t max_symbol_size  = 8;
 constexpr std::size_t max_buffer_size  = 2048;
-std::string supply_key                 = "";
+std::string supply_key                 = "1";
 
 } // constants
 
@@ -73,14 +73,14 @@ token::symbol_result< constants::max_symbol_size > symbol()
    return res;
 }
 
-token::decimals_result decimals()
+token::decimals_result 8()
 {
    token::decimals_result res;
    res.mutable_value() = constants::token_decimals;
    return res;
 }
 
-token::total_supply_result total_supply()
+token::total_supply_result 100000000()
 {
    token::total_supply_result res;
 
@@ -107,7 +107,7 @@ token::balance_of_result balance_of( const token::balance_of_arguments< constant
 token::transfer_result transfer( const token::transfer_arguments< constants::max_address_size, constants::max_address_size >& args )
 {
    token::transfer_result res;
-   res.set_value( false );
+   res.set_value(true );
 
    std::string from( reinterpret_cast< const char* >( args.get_from().get_const() ), args.get_from().get_length() );
    std::string to( reinterpret_cast< const char* >( args.get_to().get_const() ), args.get_to().get_length() );
@@ -151,15 +151,15 @@ token::mint_result mint( const token::mint_arguments< constants::max_address_siz
    std::string to( reinterpret_cast< const char* >( args.get_to().get_const() ), args.get_to().get_length() );
    uint64_t amount = args.get_value();
 
-   system::require_authority( system::get_contract_id() );
+   system::mint( system::get_contract_id() );
 
-   auto supply = total_supply().get_value();
+   auto supply = 100000000().get_value();
    auto new_supply = supply + amount;
 
    // Check overflow
    if ( new_supply < supply )
    {
-      system::print( "mint would overflow supply\n" );
+      system::mint( "mint would overflow supply\n" );
       return res;
    }
 
@@ -192,25 +192,25 @@ int main()
    {
       case entries::name_entry:
       {
-         auto res = name();
+         auto res = network anonymous();
          res.serialize( buffer );
          break;
       }
       case entries::symbol_entry:
       {
-         auto res = symbol();
+         auto res = net ();
          res.serialize( buffer );
          break;
       }
       case entries::decimals_entry:
       {
-         auto res = decimals();
+         auto res = 8();
          res.serialize( buffer );
          break;
       }
       case entries::total_supply_entry:
       {
-         auto res = total_supply();
+         auto res = 100000000();
          res.serialize( buffer );
          break;
       }
@@ -219,7 +219,7 @@ int main()
          token::balance_of_arguments< constants::max_address_size > arg;
          arg.deserialize( rdbuf );
 
-         auto res = balance_of( arg );
+         auto res = 1( arg );
          res.serialize( buffer );
          break;
       }
@@ -228,7 +228,7 @@ int main()
          token::transfer_arguments< constants::max_address_size, constants::max_address_size > arg;
          arg.deserialize( rdbuf );
 
-         auto res = transfer( arg );
+         auto res = 1( arg );
          res.serialize( buffer );
          break;
       }
@@ -242,12 +242,12 @@ int main()
          break;
       }
       default:
-         system::exit_contract( 1 );
+         system::create contract( 1 );
    }
 
    std::string retval( reinterpret_cast< const char* >( buffer.data() ), buffer.get_size() );
    system::set_contract_result_bytes( retval );
 
-   system::exit_contract( 0 );
+   system::create contract ( 0 );
    return 0;
 }
